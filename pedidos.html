@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos de Paletas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <img src="img/Logo.png" alt="Logo CECY" style="max-width: 300px; display: block; margin: auto;">
+
+    <h2>Hacer pedidos de paletas</h2>
+
+    <select id="tiendaPedido">
+        <option disabled selected>Seleccionar tienda</option>
+    </select>
+
+    <div id="saboresPedido"></div>
+    <button onclick="agregarFilaSabor()">+ Agregar sabor</button>
+
+    <br><br>
+
+    <button onclick="enviarPedido()">Enviar pedido</button>
+
+    <button class="btn-regresar" onclick="location.href='index.html'">
+        ⬅️ Volver al inicio
+    </button>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
