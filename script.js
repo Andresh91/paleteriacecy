@@ -240,8 +240,122 @@ function agregarFilaSabor() {
     saboresDiv.appendChild(fila);
 }
 
-mostrarSabores();
-mostrarTiendas();
-mostrarOpcionesDistribucion();
-mostrarHistorialEntregas();
-mostrarFormularioPedido();
+function mostrarEstadisticas() {
+    const contenedor = document.getElementById('estadisticas');
+    if (!contenedor) return;
+
+    //Estadísticas de entregas
+    let contadorPorTiendaYSabor = {};
+    let contadorPedidosPorTienda = {};
+
+    entregas.forEach(entrega => {
+        const { tienda, cantidades } = entrega;
+
+        if (!contadorPorTiendaYSabor[tienda]) contadorPorTiendaYSabor[tienda] = {};
+        if (!contadorPedidosPorTienda[tienda]) contadorPedidosPorTienda[tienda] = 0;
+
+        Object.entries(cantidades).forEach(([sabor, cantidad]) => {
+            if (!contadorPorTiendaYSabor[tienda][sabor]) contadorPorTiendaYSabor[tienda][sabor] = 0;
+            contadorPorTiendaYSabor[tienda][sabor] += cantidad;
+            contadorPedidosPorTienda[tienda] += cantidad;
+        });
+    });
+
+    //1.Grafica de pedidos totales por tienda
+    const tiendasGraficas = Object.keys(contadorPedidosPorTienda);
+    const pedidos = Object.values(contadorPedidosPorTienda);
+
+    const ctx1 = document.getElementById('graficaPedidosPorTienda').getContext('2d');
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: tiendas,
+            datasets: [{
+                label: 'Total de  paletas por tienda',
+                data: pedidos,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            Plugins: {
+                title: {
+                    display: true,
+                    text: 'Paletas entregadas por tienda',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    //2.Grafica del sabor más entregado por tienda
+    const saboresFavoritos = tiendas.map(tienda => {
+        let maxSabor = '';
+        let maxCantidad = 0;
+        const sabores = contadorPorTiendaYSabor[tienda];
+        for (let sabor in sabores) {
+            if (sabores[sabor] > maxCantidad) {
+                maxCantidad = sabores[sabor];
+                maxSabor = sabor;
+            }
+        }
+        return maxSabor;
+    });
+
+    const ctx2 = document.getElementById('graficaSaborPorTienda').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: tiendas,
+            datasets: [{
+                label: 'sabor mas entregado',
+                data: tiendas.map(t => contadorPorTiendaYSabor[t][saboresFavoritos[tiendas.indexOf(t)]]),
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            Plugins: {
+                title: {
+                    display: true,
+                    text: 'Sabor más popular por tienda',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    //3.Texto resumen
+    const tiendaMasPedidos = tiendas.reduce((a, b) =>
+        contadorPedidosPorTienda[a] > contadorPedidosPorTienda[b] ? a : b
+    );
+
+    let html = `<p><strong>Tienda que más ha pedido:</strong> ${tiendaMasPedidos} (${contadorPedidosPorTienda[tiendaMasPedidos]} paletas)</p>`;
+    html += `<h3>Sabor más entregado por tienda:</h3><ul>`;
+    tiendas.forEach((tienda, i) => {
+        html += `<li><strong>${tienda}:</strong> ${saboresFavoritos[i]} (${contadorPorTiendaYSabor[tienda][saboresFavoritos[i]]} paletas)</li>`;
+    });
+    html += `</ul>`;
+
+    contenedor.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    mostrarSabores();
+    mostrarTiendas();
+    mostrarOpcionesDistribucion();
+    mostrarHistorialEntregas();
+    mostrarFormularioPedido();
+});
