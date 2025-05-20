@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administrar paleteria CECY</title>
+    <title>Administrar Helados La Tía Cecy</title>
     <link rel="stylesheet" href="styles.css">
-    <script defer src="script.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
 </head>
 <body>
+    <a href="index.html">
     <img src="img/Logo.png" alt="Logo CECY" style="max-width: 300px; display: block; margin: auto;">
+    </a>
 
     <h1>Agregar sabor de Paletas</h1>
 
@@ -41,9 +44,15 @@
     <h1>Historial de Entregas</h1>
     <div id="historialEntregas"></div>
 
-    <button class="btn-regresar" onclick="location.href='index.html'">
-        ⬅️ Volver al inicio
-    </button>
+    <hr>
+
+    <h1>Estadísticas</h1>
+    <div id="estadisticas"></div>
+
+    <canvas id="graficaPedidosPorTienda" width="400" height="200"></canvas>
+    <canvas id="graficaSaborPorTienda" width="400" height="200"></canvas>
+
+    <button onclick="mostrarEstadisticas()">Ver estadísticas</button>
 
 </body>
 </html>
