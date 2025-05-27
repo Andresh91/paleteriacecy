@@ -1,34 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrar Helados La Tía Cecy</title>
     <link rel="stylesheet" href="styles.css">
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js" defer></script>
 </head>
 <body>
     <a href="index.html">
-    <img src="img/Logo.png" alt="Logo CECY" style="max-width: 300px; display: block; margin: auto;">
+        <img src="img/Logo.png" alt="Logo CECY" style="max-width: 300px; display: block; margin: auto;">
     </a>
 
     <h1>Agregar sabor de Paletas</h1>
-
     <label>Nombre del sabor:</label>
     <input type="text" id="saborInput" placeholder="Agregar nuevo sabor">
 
     <label>Imagen del sabor:</label>
     <input type="file" id="imagenSabor" accept="image/*">
 
-    <button onclick="agregarSabor()">Agregar</button>
+    <button id="btnAgregarSabor">Agregar</button>
     <div id="listaSabores"></div>
 
     <hr>
     
     <h1>Agregar tienda</h1>
     <input type="text" id="tiendaInput" placeholder="Agregar nueva tienda">
-    <button onclick="agregarTienda()">Agregar</button>
+    <button id="btnAgregarTienda">Agregar</button>
     <div id="listaTiendas"></div>
 
     <hr>
@@ -37,7 +36,7 @@
     <label for="tiendaSelect">Tienda:</label>
     <select id="tiendaSelect"></select>
     <div id="saboresDistribuir"></div>
-    <button onclick="registrarEntrega()">Registrar Entrega</button>
+    <button id="btnRegistrarEntrega">Registrar Entrega</button>
 
     <hr>
 
@@ -52,7 +51,8 @@
     <canvas id="graficaPedidosPorTienda" width="400" height="200"></canvas>
     <canvas id="graficaSaborPorTienda" width="400" height="200"></canvas>
 
-    <button onclick="mostrarEstadisticas()">Ver estadísticas</button>
+    <button id="btnMostrarEstadisticas">Ver estadísticas</button>
+    <button id="btnActualizar">Actualizar</button>
 
 </body>
 </html>
