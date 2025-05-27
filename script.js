@@ -227,3 +227,89 @@ document.addEventListener("DOMContentLoaded", () => {
         cargarEntregas();
     }
 });
+
+//Funciones para pedidos.html
+document.addEventListener("DOMContentLoaded", async () => {
+    const tiendaPedido = document.getElementById("tiendaPedido");
+    const saboresPedido = document.getElementById("saboresPedido");
+    const btnAgregarSabor = document.getElementById("btnAgregarSabor");
+    const btnEnviarPedido = document.getElementById("btnEnviarPedido");
+
+    if (tiendaPedido && saboresPedido && btnAgregarSabor && btnEnviarPedido) {
+        let sabores = [];
+        let saboresAgregados = [];
+
+        async function cargarTiendas() {
+            const snapshot = await getDocs(collection(db, "tiendas"));
+            const tiendas = snapshot.docs.map(doc => doc.data().nombre);
+            tiendaPedido.innerHTML = `<option disabled selected>Seleccionar tienda</option>` +
+                tiendas.map(t => `<option value="${t}">${t}</option>`).join('');
+        }
+
+        async function cargarSabores() {
+            const snapshot = await getDocs(collection(db, "sabores"));
+            sabores = snapshot.docs.map(doc => ({
+                nombre: doc.data().nombre,
+                imagenUrl: doc.data().imagenUrl || ""
+            }));
+        }
+
+        btnAgregarSabor.addEventListener("click", () => {
+            const disponibles = sabores.filter(s =>
+                !saboresAgregados.includes(s.nombre)
+            );
+            if (disponibles.length === 0) {
+                alert("Ya agregaste todos los sabores");
+                return;
+            }
+            
+            const sabor = disponibles[0];
+            saboresAgregados.push(sabor.nombre);
+
+            const div = document.createElement("div");
+            div.innerHTML = `
+                <label>
+                    <img src="${sabor.imagenUrl}" alt="${sabor.nombre}" style="width: 40px;">
+                    ${sabor.nombre}:
+                    <input type="number" min="1" value="1" data-sabor="${sabor.nombre}">
+                </label>
+            `;
+            saboresPedido.appendChild(div);
+        });
+
+        btnEnviarPedido.addEventListener("click", () => {
+            const tienda = tiendaPedido.value;
+            if (!tienda || tienda === "Seleccionar tienda") {
+                alert("Selecciona una tienda");
+                return;
+            }
+
+            const inputs = saboresPedido.querySelectorAll("input[type='number']");
+            const pedido = {};
+
+            inputs.forEach(input => {
+                const sabor = input.getAttribute("data-sabor");
+                const cantidad = parseInt(input.value) || 0;    
+                if (cantidad > 0) {
+                    pedido[sabor] = cantidad;
+                }
+            });
+
+            if (Object.keys(pedido).length === 0) {
+                alert("Agregar al menos un sabor con cantidad");
+                return;
+            }
+
+            const mensaje = `🧊 Pedido para ${tienda}:\n` + Object.entries(pedido).map(
+                ([sabor, cantidad]) => `- ${sabor}: ${cantidad}`
+            ).join('\n');
+
+            const numero = "5216151077971";
+            const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        });
+
+        await cargarTiendas();
+        await cargarSabores();
+    }
+});
