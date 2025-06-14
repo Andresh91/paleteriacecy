@@ -75,6 +75,7 @@ async function enviarPedido() {
 let mensaje = `🍦 *Pedido de paletas - Tía Cecy* 🍦\n`;
 mensaje += `📍 Tienda: *${tiendaNombre}*\n\n`;
 detalles.forEach(item => {
+    mensaje += `*Sabores:*\n`;
     mensaje += `✅ ${item.saborNombre}: ${item.cantidad}\n`;
 });
 mensaje += `\nGracias por tu pedido. 🙌`;
