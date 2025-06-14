@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Helados La TíaCecy</title>
+        <link rel="stylesheet" href="styles.css">
+        <script type="module" src="index.js" defer></script>
+    </head>
+    <body>
+       <main>
+            <div class="contenedor_todo">
+                <div class="caja_trasera">
+                    <div class="caja_trasera-pedidos">
+                        <h3>¿Quieres Helados de la Tía Cecy?</h3>
+                        <p>Haz tu pedido y recibe tus paletas</p>
+                        <button id="btn_pedidos-tienda">Pedir aquí</button>
+                    </div>
+                    <div class="caja_trasera-login">
+                        <h3>Administrar pedidos</h3>
+                        <button id="btn_iniciar-sesion">Iniciar Sesión</button>
+                    </div>
+                </div>
+
+                <!--Formulario de Pedidos y Login-->
+                <div class="contenedor_pedido-login">
+                    <!--Pedidos-->
+                    <form action="" class="formulario_pedidos">
+                        <h2>Pedir Aquí</h2>                       
+                        <button type="button" onclick="location.href='pedidos.html'">Pedir</button>
+                    </form>
+
+                    <!--Login-->
+                    <form action="" class="formulario_login">
+                        <h2>Iniciar Sesión</h2>
+                        <input type="text" placeholder="Usuario" />
+                        <input type="password" placeholder="Contraseña" />
+                        <button href="administrador.html">Entrar</button>
+                    </form>
+                </div>
+            </div>
+       </main>
+    </body>
+</html>
