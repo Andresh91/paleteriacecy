@@ -106,40 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // === Eventos para Recuperación de Contraseña ===
-  document.getElementById("btnRecuperarContraseña").addEventListener("click", (e) => {
-    e.preventDefault();
-    document.getElementById("recuperarContrasena").style.display = "block";
-  });
-
-  document.getElementById("btnEnviarRecuperacion").addEventListener("click", async () => {
-    const nombreIngresado = document.getElementById("nombreRecuperacion").value.trim();
-
-    if (!nombreIngresado) {
-      return alert("Ingresa el nombre de la tienda");
-    }
-
-    try {
-      const snapshot = await getDocs(collection(db, "tiendas"));
-      let tiendaEncontrada = null;
-
-      snapshot.forEach((docSnap) => {
-        if (docSnap.data().nombre.toLowerCase() === nombreIngresado.toLowerCase()) {
-          tiendaEncontrada = { id: docSnap.id, ...docSnap.data() };
-        }
-      });
-
-      if (!tiendaEncontrada) {
-        return alert("No se encontró ninguna tienda con ese nombre.");
-      }
-
-      // Generar contraseña aleatoria de 4 dígitos
-      const nuevaClave = Math.floor(1000 + Math.random() * 9000).toString();
-
-      await updateDoc(doc(db, "tiendas", tiendaEncontrada.id), {
-        contraseña: nuevaClave,
-      });
-
       alert(`Nueva contraseña generada: ${nuevaClave}\nGuárdala en un lugar seguro.`);
       document.getElementById("recuperarContrasena").style.display = "none";
     } catch (error) {
