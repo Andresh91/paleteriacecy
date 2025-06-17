@@ -1,25 +1,49 @@
-import { db, collection, getDocs, addDoc } from './firebase.js';
+import { db, getDoc, collection, getDocs, addDoc, doc } from './firebase.js';
 
-const tiendaSelect = document.getElementById("tiendaPedido");
 const saboresDiv = document.getElementById("saboresPedido");
 const btnAgregarSabor = document.getElementById("btnAgregarSabor");
 const btnEnviarPedido = document.getElementById("btnEnviarPedido");
 
 let saboresDisponibles = [];
 let saboresSeleccionados = [];
+let tiendaId = "";
+let tiendaNombre = "";
 
-// Cargar tiendas
-async function cargarTiendas() {
-  const snapshot = await getDocs(collection(db, "tiendas"));
-  snapshot.forEach(doc => {
-    const option = document.createElement("option");
-    option.value = doc.id;
-    option.textContent = doc.data().nombre;
-    tiendaSelect.appendChild(option);
+// Obtener tienda desde la URL y validar en Firestore
+async function mostrarNombreTienda() {
+  const params = new URLSearchParams(window.location.search);
+  tiendaId = params.get("tienda");
+
+  console.log("ID recibido:", tiendaId);
+
+  // Cambiar contraseña
+  document.getElementById("btnCambiarContrasena").addEventListener("click", (e) => {
+    e.preventDefault();
+    if (!tiendaId) {
+      alert("No se especificó ninguna tienda.");
+      return;
+    }
+    window.location.href = `contrasena.html?tienda=${tiendaId}`;
   });
+
+
+  try {
+    const tiendaDoc = await getDoc(doc(db, "tiendas", tiendaId));
+    if (tiendaDoc.exists()) {
+      tiendaNombre = tiendaDoc.data().nombre;
+      document.getElementById("nombreTienda").textContent = tiendaNombre;
+    } else {
+      document.getElementById("nombreTienda").textContent = "Tienda no encontrada";
+      btnEnviarPedido.disabled = true;
+      btnAgregarSabor.disabled = true;
+    }
+  } catch (error) {
+    console.error("Error al obtener tienda:", error);
+    alert("Hubo un error al verificar la tienda.");
+  }
 }
 
-// Cargar sabores
+// Cargar sabores disponibles desde Firestore
 async function cargarSabores() {
   const snapshot = await getDocs(collection(db, "sabores"));
   saboresDisponibles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -47,45 +71,35 @@ function agregarSabor() {
   saboresSeleccionados.push({ select, inputCantidad });
 }
 
-// Enviar pedido
 async function enviarPedido() {
-  const tiendaId = tiendaSelect.value;
-  if (!tiendaId) return alert("Selecciona una tienda.");
+  if (!tiendaId || !tiendaNombre) return alert("No se puede enviar el pedido sin tienda válida.");
 
-  //Obtener nombre de la tienda para Whatsapp
-  const tiendaNombre = tiendaSelect.options[tiendaSelect.selectedIndex].text;
-  
-  //Obtener detalles del pedido
-  const detalles = saboresSeleccionados.map(({ select, inputCantidad }) => {
-    return {
-      saborId: select.value,
-      saborNombre: select.options[select.selectedIndex].text,
-      cantidad: parseInt(inputCantidad.value)
-    };
-  });
+  const detalles = saboresSeleccionados.map(({ select, inputCantidad }) => ({
+    saborId: select.value,
+    saborNombre: select.options[select.selectedIndex].text,
+    cantidad: parseInt(inputCantidad.value)
+  }));
 
-  //Guardar en la base de datos (Firestore)
+  // Guardar en Firestore
   await addDoc(collection(db, "pedidos"), {
     tiendaId,
+    tiendaNombre,
     fecha: new Date().toISOString(),
     detalles
   });
 
-  //Enviar mensaje Whatsapp
-let mensaje = `🍦 *Pedido de paletas - Helados La Tía Cecy* 🍦\n`;
-mensaje += `📍 Tienda: *${tiendaNombre}*\n\n`;
-detalles.forEach(item => {
-    mensaje += `*Sabores:*\n`;
-    mensaje += `✅ ${item.saborNombre}: ${item.cantidad}\n`;
-});
-mensaje += `\nAgradecemos tu pedido. 🙌`;
+  // Mensaje para WhatsApp
+  let mensaje = `🍦 *Pedido de paletas - Helados La Tía Cecy* 🍦\n`;
+  mensaje += `📍 Tienda: *${tiendaNombre}*\n\n`;
+  mensaje += `*Sabores:*\n`;
+  detalles.forEach(item => {
+    mensaje += `✅ ${item.saborNombre}: ${item.cantidad} Pzs\n`;
+  });
+  mensaje += `\nGracias por tu pedido. 🙌`;
 
-//Número de Whatsapp
-const numero = "526151077971";
-
-//Abrir Whatsapp
-const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
-window.open(url, "_blank");
+  const numero = "526151077971";
+  const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+  window.open(url, "_blank");
 
   alert("Pedido enviado correctamente.");
   window.location.reload();
@@ -94,6 +108,6 @@ window.open(url, "_blank");
 btnAgregarSabor.addEventListener("click", agregarSabor);
 btnEnviarPedido.addEventListener("click", enviarPedido);
 
-// Cargar datos al inicio
-cargarTiendas();
+// Iniciar funciones
+mostrarNombreTienda();
 cargarSabores();
