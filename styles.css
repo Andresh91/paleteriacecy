@@ -1,3 +1,4 @@
+/* General */
 body {
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
@@ -17,7 +18,7 @@ body::before{
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url(/paleteriacecy/img/Logo.png);
+    background-image: url(../img/Logo.png);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -235,12 +236,23 @@ canvas {
 .sabor-item {
     background-color: #ffffff;
     padding: 10px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.sabor-item select{
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.sabor-item input{
+    width: 300px;
+    padding: 9px;
 }
 
 .sabor-item img {
@@ -346,6 +358,22 @@ button#btnActualizarEstadisticas {
   font-size: 16px;
 }
 
+button#btnActualizarEstadisticas:hover {
+  background-color: #45a049;
+}
+
+.btn-eliminar-sabor{
+    background-color: #e74c3c;
+    border: none;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-eliminar-sabor:hover{
+    background-color: #c0392b;
+}
 button#btnActualizarEstadisticas:hover {
   background-color: #45a049;
 }
