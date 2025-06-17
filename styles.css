@@ -17,7 +17,7 @@ body::before{
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url(/paleteriacecy/img/Logo.png);
+    background-image: url(../img/Logo.png);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -186,6 +186,13 @@ main{
         left: 5px;
         margin: auto;
     }
+}
+
+#listaTiendas{
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
 }
 
 /*pedidos.html*/
