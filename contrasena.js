@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return alert("Tienda no encontrada.");
       }
 
-      const claveGuardada = tiendaDoc.data().clave;
+      const claveGuardada = tiendaDoc.data().contraseña;
 
       if (claveActual !== claveGuardada) {
         return alert("La contraseña actual es incorrecta.");
@@ -76,13 +76,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Actualizar clave
       await updateDoc(tiendaRef, {
-        clave: claveNueva,
+        contraseña: claveNueva,
       });
 
       alert("Contraseña actualizada correctamente.");
       claveActualInput.value = "";
       claveNuevaInput.value = "";
       claveConfirmarInput.value = "";
+
+      // Redirigir a index
+      window.location.href = "index.html";
+
     } catch (error) {
       console.error("Error al cambiar contraseña:", error);
       alert("Error al cambiar la contraseña.");
