@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar contraseña</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="contrasena.js" defer></script>
+</head>
+<body>
+     <header class="barra-navegacion">
+        <div class="barra-logo-titulo">
+            <img src="img/Logo.png" alt="Logo CECY" class="logo-barra">
+            <h2 >Actualizar contraseña</h2>
+        </div>
+        <nav class="barra-opciones">
+            <a href="index.html">Inicio</a>
+            <a id="btnRegresar" href="pedidos.html">Pedidos</a>
+        </nav>
+    </header>
+    <h2 id="nombreTienda">Cargando tienda...</h2>
+    <h3>Cambiar contraseña</h3>
+        <div id="cambiarClaveForm">
+            <input type="password" id="claveActual" placeholder="Contraseña actual"><br>
+            <br>
+            <input type="password" id="claveNueva" placeholder="Nueva contraseña"><br>
+            <br>
+            <input type="password" id="claveConfirmar" placeholder="Confirmar nueva contraseña"><br>
+            <button id="btnCambiarClave">Actualizar contraseña</button>
+        </div>
+</body>
+</html>
