@@ -51,6 +51,7 @@ async function cargarSabores() {
 
 function agregarSabor() {
   const div = document.createElement("div");
+  div.classList.add("sabor-item");
 
   const select = document.createElement("select");
   saboresDisponibles.forEach(sabor => {
@@ -64,8 +65,21 @@ function agregarSabor() {
   inputCantidad.type = "number";
   inputCantidad.placeholder = "Cantidad";
 
+  const btnEliminar = document.createElement("button");
+  btnEliminar.textContent = "X";
+  btnEliminar.classList.add("btn-eliminar-sabor");
+
+  btnEliminar.addEventListener("click", () => {
+    const index = saboresSeleccionados.findIndex(item => item.select === select);
+    if (index !== -1) {
+      saboresSeleccionados.splice(index, 1);
+    }
+    div.remove();
+  });
+
   div.appendChild(select);
   div.appendChild(inputCantidad);
+  div.appendChild(btnEliminar);
   saboresDiv.appendChild(div);
 
   saboresSeleccionados.push({ select, inputCantidad });
@@ -80,13 +94,11 @@ async function enviarPedido() {
     cantidad: parseInt(inputCantidad.value)
   }));
 
-  // Guardar en Firestore
-  await addDoc(collection(db, "pedidos"), {
-    tiendaId,
-    tiendaNombre,
-    fecha: new Date().toISOString(),
-    detalles
-  });
+  // Validación simple
+  const datosValidados = detalles.every(item => item.saborId && item.cantidad > 0);
+  if (!datosValidados) {
+    return alert("Por favor, rellena todos los campos.");
+  }
 
   // Mensaje para WhatsApp
   let mensaje = `🍦 *Pedido de paletas - Helados La Tía Cecy* 🍦\n`;
@@ -101,8 +113,24 @@ async function enviarPedido() {
   const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
   window.open(url, "_blank");
 
-  alert("Pedido enviado correctamente.");
-  window.location.reload();
+    // Guardar en Firestore
+  try {
+    await addDoc(collection(db, "pedidos"), {
+      tiendaId,
+      tiendaNombre,
+      fecha: new Date().toISOString(),
+      detalles
+    });
+
+    setTimeout(() => {
+      alert("Pedido enviado correctamente.");
+      window.location.reload();
+    }, 1000);
+
+  } catch (error) {
+    console.error("Error al enviar pedido:", error);
+    alert("Hubo un error al guardar el pedido. Por favor, inténtalo de nuevo.");
+  }
 }
 
 btnAgregarSabor.addEventListener("click", agregarSabor);
