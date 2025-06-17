@@ -26,8 +26,17 @@
                 <div class="contenedor_pedido-login">
                     <!--Pedidos-->
                     <form action="" class="formulario_pedidos">
-                        <h2>Pedir Aquí</h2>                       
-                        <button type="button" onclick="location.href='pedidos.html'">Pedir</button>
+                        <h2>Pedir Aquí</h2>
+
+                        <label for="tiendaSelect">Selecciona tu tienda:</label>
+                        <select id="tiendaSelect">
+                            <option value="">-- Selecciona una tienda --</option>
+                        </select>
+
+                        <label for="claveTienda">Contraseña:</label>
+                        <input type="password" id="claveTienda" placeholder="Ingresa contraseña"></input>
+                        
+                        <button type="button" id="btn_hacer_pedido">Pedir</button>
                     </form>
 
                     <!--Login-->
@@ -35,7 +44,7 @@
                         <h2>Iniciar Sesión</h2>
                         <input type="text" placeholder="Usuario" />
                         <input type="password" placeholder="Contraseña" />
-                        <button href="administrador.html">Entrar</button>
+                        <button type="button" id="btn_login_admin">Entrar</button>
                     </form>
                 </div>
             </div>
