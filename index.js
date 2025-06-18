@@ -1,4 +1,4 @@
-import {  db,  collection,  getDoc,  getDocs,  doc,  auth,  signInWithEmailAndPassword,} from "./firebase.js";
+import {  db,  collection, updateDoc,  getDoc,  getDocs,  doc,  auth,  signInWithEmailAndPassword,} from "./firebase.js";
 
 // Esperar a que el DOM esté listo
 document.addEventListener("DOMContentLoaded", () => {
@@ -103,14 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "administrador.html";
     } catch (error) {
       alert("Error al iniciar sesión: " + error.message);
-    }
-  });
-
-      alert(`Nueva contraseña generada: ${nuevaClave}\nGuárdala en un lugar seguro.`);
-      document.getElementById("recuperarContrasena").style.display = "none";
-    } catch (error) {
-      console.error("Error al recuperar contraseña:", error);
-      alert("Error al recuperar la contraseña. Por favor, inténtalo de nuevo.");
     }
   });
 
