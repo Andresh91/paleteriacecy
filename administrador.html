@@ -30,7 +30,7 @@
 
     <!-- Contenedor gráfica de comparativa sabores x tiendas -->
     <div id="contenedorGraficaComparativa" style="display: none; margin-top: 20px;">
-      <canvas id="graficaComparativa" width="900" height="500"></canvas>
+      <canvas id="graficaComparativa" width="700" height="300"></canvas>
     </div>
 
     <div style="text-align: center; margin-bottom: 20px">
@@ -38,6 +38,13 @@
       <select id="tiendaBorrar">
         <option value="">-- Selecciona una tienda --</option>
       </select>
+
+      <label for="pedidoBorrar">Selecciona un pedido:</label>
+      <select id="pedidoBorrar">
+        <option value="">-- Selecciona un pedido --</option>
+      </select>
+
+
       <p id="infoPedidosTienda" style="margin-top: 10px; font-weight: bold"></p>
       <button id="btnBorrarPedidosTienda" style="background-color: crimson; color: white">
         Borrar pedidos de tienda
