@@ -6,7 +6,7 @@
     <title>Administrador - Estadísticas de Pedidos</title>
     <link rel="stylesheet" href="styles.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="admin.js"></script>
+    <script type="module" src="admin.js" defer></script>
   </head>
   <body>
     <!-- Barra de navegación -->
@@ -16,11 +16,11 @@
     </header>
 
     <!-- Sección de estadísticas -->
-    <h1>Estadísticas</h1>
+    <h2>Estadísticas</h2>
 
     <div style="text-align: center; margin-bottom: 20px">
       <button id="btnGraficaTiendas">Pedidos por Tienda</button>
-      <button id="btnGraficaSabores">Paletas por Sabor</button>
+      <button id="btnGraficaComparativa">Comparativa Sabores x Tiendas</button>
     </div>
 
     <!-- Contenedor gráfica de pedidos por tienda -->
@@ -28,9 +28,9 @@
       <canvas id="graficaTiendas"></canvas>
     </div>
 
-    <!-- Contenedor gráfica de paletas por sabor -->
-    <div id="contenedorGraficaSabores" style="display: block">
-      <canvas id="graficaSabores"></canvas>
+    <!-- Contenedor gráfica de comparativa sabores x tiendas -->
+    <div id="contenedorGraficaComparativa" style="display: none; margin-top: 20px;">
+      <canvas id="graficaComparativa" width="900" height="500"></canvas>
     </div>
 
     <div style="text-align: center; margin-bottom: 20px">
@@ -39,10 +39,7 @@
         <option value="">-- Selecciona una tienda --</option>
       </select>
       <p id="infoPedidosTienda" style="margin-top: 10px; font-weight: bold"></p>
-      <button
-        id="btnBorrarPedidosTienda"
-        style="background-color: crimson; color: white"
-      >
+      <button id="btnBorrarPedidosTienda" style="background-color: crimson; color: white">
         Borrar pedidos de tienda
       </button>
     </div>
