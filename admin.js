@@ -158,38 +158,52 @@ async function cargarTiendasParaBorrar() {
 }
 
 // Mostrar cuántos pedidos tiene la tienda seleccionada
+const pedidoBorrarSelect = document.getElementById("pedidoBorrar");
+
 tiendaBorrarSelect.addEventListener("change", async () => {
   const tiendaId = tiendaBorrarSelect.value;
-  if (!tiendaId) {
-    infoPedidosTienda.textContent = "";
+  infoPedidosTienda.textContent = "";
+  pedidoBorrarSelect.innerHTML ='<option value="">-- Selecciona un pedido --</option>';
+
+  if (!tiendaId) return;
+
+  const snapshot = await getDocs(collection(db, "pedidos"));
+  const pedidos = snapshot.docs.filter(doc => doc.data().tiendaId === tiendaId);
+
+  if (pedidos.length === 0) {
+    infoPedidosTienda.textContent = "Esta tienda no tiene pedidos registrados.";
     return;
   }
-  const snapshot = await getDocs(collection(db, "pedidos"));
-  const count = snapshot.docs.filter(doc => doc.data().tiendaId === tiendaId).length;
-  infoPedidosTienda.textContent = count
-    ? `Esta tienda tiene ${count} paletas pedidas.`
-    : "Esta tienda no tiene pedidos registrados.";
+
+  infoPedidosTienda.textContent = `Esta tienda tiene ${pedidos.length} pedidos.`;
+  
+  pedidos.forEach(doc => {
+    const pedido = doc.data();
+    const fecha = pedido.fecha ? new Date(pedido.fecha).toLocaleString() : "Sin fecha";
+    const opt = document.createElement("option");
+    opt.value = doc.id;
+    opt.textContent = `Pedido del ${fecha}`;
+    pedidoBorrarSelect.appendChild(opt);
+  });
 });
 
 // Borrar todos los pedidos de la tienda seleccionada
 btnBorrarPedidosTienda.addEventListener("click", async () => {
-  const tiendaId = tiendaBorrarSelect.value;
-  if (!tiendaId) return alert("Selecciona una tienda.");
+  const pedidoId = pedidoBorrarSelect.value;
 
-  if (!confirm("¿Seguro que quieres borrar todos los pedidos de esta tienda?")) return;
+  if (!pedidoId) return alert("Selecciona un pedido para borrar.");
 
-  const pedidosSnap = await getDocs(collection(db, "pedidos"));
-  const borrados = pedidosSnap.docs
-    .filter(doc => doc.data().tiendaId === tiendaId)
-    .map(docPedido => deleteDoc(doc(db, "pedidos", docPedido.id)));
+  const confirmar = confirm("¿Seguro que quieres borrar este pedido?");
+  if (!confirmar) return;
 
-  await Promise.all(borrados);
-  alert("Pedidos eliminados correctamente.");
+  await deleteDoc(doc(db, "pedidos", pedidoId));
 
-  // Refrescar select y estadística
-  tiendaBorrarSelect.selectedIndex = 0;
-  infoPedidosTienda.textContent = "";
-  cargarEstadisticas();
+  alert("Pedido eliminado correctamente.");
+
+  // Actualizar interfaz
+  pedidoBorrarSelect.selectedIndex = 0;
+  tiendaBorrarSelect.dispatchEvent(new Event("change"));
+  await cargarEstadisticas();
 });
 
 // Inicialización
