@@ -16,6 +16,7 @@ let chartTiendas;
 // Al hacer clic: mostrar solo la gráfica de tiendas
 btnGraficaTiendas.addEventListener("click", () => {
   contenedorGraficaTiendas.style.display = "block";
+  contenedorComparativa.style.display = "none";
 });
 
 // Función para cargar y graficar datos
