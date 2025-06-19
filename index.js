@@ -47,6 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function iniciarSesion() {
+    if (formularioLogin.style.display === "block") return;
+
     if (window.innerWidth > 850) {
       formularioLogin.style.display = "block";
       contenedorPedidoLogin.style.left = "410px";
@@ -64,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // === Eventos ===
-  window.addEventListener("resize", anchoPage);
   btnPedidosTienda.addEventListener("click", pedidosTienda);
   btnIniciarSesion.addEventListener("click", iniciarSesion);
 
