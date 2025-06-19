@@ -1,198 +1,198 @@
-import { db, collection, getDocs, deleteDoc, doc } from "./firebase.js";
+import { db, collection, getDocs, deleteDoc, doc, updateDoc, getDoc } from "./firebase.js";
 
 // Referencias a botones y contenedores
 const btnGraficaTiendas = document.getElementById("btnGraficaTiendas");
-const btnGraficaSabores = document.getElementById("btnGraficaSabores");
-const contenedorGraficaTiendas = document.getElementById(
-  "contenedorGraficaTiendas"
-);
-const contenedorGraficaSabores = document.getElementById(
-  "contenedorGraficaSabores"
-);
+const contenedorGraficaTiendas = document.getElementById("contenedorGraficaTiendas");
+const tiendaBorrarSelect = document.getElementById("tiendaBorrar");
 const infoPedidosTienda = document.getElementById("infoPedidosTienda");
+const btnBorrarPedidosTienda = document.getElementById("btnBorrarPedidosTienda");
 
-// Canvas para gráficas
+// Contexto del canvas
 const ctxTiendas = document.getElementById("graficaTiendas").getContext("2d");
-const ctxSabores = document.getElementById("graficaSabores").getContext("2d");
 
-// Variables para guardar las gráficas activas (evitar duplicadas)
-let chartTiendas, chartSabores;
+// Variable para la gráfica
+let chartTiendas;
 
-// Escuchar botones
+// Al hacer clic: mostrar solo la gráfica de tiendas
 btnGraficaTiendas.addEventListener("click", () => {
   contenedorGraficaTiendas.style.display = "block";
-  contenedorGraficaSabores.style.display = "none";
 });
 
-btnGraficaSabores.addEventListener("click", () => {
-  contenedorGraficaSabores.style.display = "block";
-  contenedorGraficaTiendas.style.display = "none";
-});
-
-// Función principal para cargar datos y graficar
+// Función para cargar y graficar datos
 async function cargarEstadisticas() {
-  const pedidosSnapshot = await getDocs(collection(db, "pedidos"));
-  const tiendasSnapshot = await getDocs(collection(db, "tiendas"));
+  // Leer todos los pedidos y tiendas
+  const [pedidosSnap, tiendasSnap] = await Promise.all([
+    getDocs(collection(db, "pedidos")),
+    getDocs(collection(db, "tiendas"))
+  ]);
 
-  // Crear diccionario de IDs → nombres
+  // Map de ID de tienda → nombre
   const mapaTiendas = {};
-  tiendasSnapshot.forEach((doc) => {
+  tiendasSnap.forEach(doc => {
     mapaTiendas[doc.id] = doc.data().nombre;
   });
 
+  // Contar total de paletas por tienda
   const conteoTiendas = {};
-  const conteoSabores = {};
-
-  pedidosSnapshot.forEach((doc) => {
-    const pedido = doc.data();
-    const tiendaId = pedido.tiendaId;
-    const detalles = pedido.detalles || [];
-
-    // Usar el nombre real de la tienda (o el ID si no existe)
-    const nombreTienda = mapaTiendas[tiendaId] || tiendaId;
-    conteoTiendas[nombreTienda] = (conteoTiendas[nombreTienda] || 0) + 1;
-
-    // Contar total de paletas por sabor
-    detalles.forEach((detalle) => {
-      const saborNombre = detalle.saborNombre || "Desconocido";
-      const cantidad = detalle.cantidad || 0;
-      conteoSabores[saborNombre] = (conteoSabores[saborNombre] || 0) + cantidad;
+  pedidosSnap.forEach(docPedido => {
+    const { tiendaId, detalles = [] } = docPedido.data();
+    const nombre = mapaTiendas[tiendaId] || tiendaId;
+    detalles.forEach(({ cantidad = 0 }) => {
+      conteoTiendas[nombre] = (conteoTiendas[nombre] || 0) + cantidad;
     });
   });
 
-  graficarTiendas(conteoTiendas);
-  graficarSabores(conteoSabores);
-}
-
-// Crear gráfica por tienda
-function graficarTiendas(data) {
-  const labels = Object.keys(data);
-  const valores = Object.values(data);
+  // Graficar
+  const labels = Object.keys(conteoTiendas);
+  const data = Object.values(conteoTiendas);
 
   if (chartTiendas) chartTiendas.destroy();
-
   chartTiendas = new Chart(ctxTiendas, {
     type: "bar",
     data: {
       labels,
-      datasets: [
-        {
-          label: "Pedidos por tienda",
-          data: valores,
-          backgroundColor: "#8B4513",
-        },
-      ],
+      datasets: [{
+        label: "Total de paletas",
+        data,
+        backgroundColor: "#8B4513"
+      }]
     },
-    options: {
-      responsive: true,
-    },
+    options: { responsive: true }
   });
 }
 
-// Crear gráfica por sabor
-function graficarSabores(data) {
-  const labels = Object.keys(data);
-  const valores = Object.values(data);
+const btnComparativa = document.getElementById("btnGraficaComparativa");
+const contenedorComparativa = document.getElementById("contenedorGraficaComparativa");
+const ctxComparativa = document.getElementById("graficaComparativa").getContext("2d");
+let chartComparativa;
 
-  if (chartSabores) chartSabores.destroy();
+// Mostrar/ocultar contenedores
+btnComparativa.addEventListener("click", async () => {
+  contenedorGraficaTiendas.style.display = "none";
+  contenedorComparativa.style.display = "block";
+  await graficaComparativaSabores();
+});
 
-  chartSabores = new Chart(ctxSabores, {
-    type: "pie",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Paletas por sabor",
-          data: valores,
-          backgroundColor: generarColores(labels.length),
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-    },
-  });
-}
-
-// Función para generar colores aleatorios
 function generarColores(n) {
   const colores = [];
   for (let i = 0; i < n; i++) {
-    const r = Math.floor(Math.random() * 150);
-    const g = Math.floor(Math.random() * 100);
-    const b = Math.floor(Math.random() * 15);
+    const r = Math.floor(Math.random() * 156 + 100);
+    const g = Math.floor(Math.random() * 156 + 100);
+    const b = Math.floor(Math.random() * 156 + 100);
     colores.push(`rgb(${r},${g},${b})`);
   }
   return colores;
 }
 
-const tiendaBorrarSelect = document.getElementById("tiendaBorrar");
-const btnBorrarPedidosTienda = document.getElementById(
-  "btnBorrarPedidosTienda"
-);
+async function graficaComparativaSabores() {
+  // Traemos los pedidos y las tiendas
+  const [pedidosSnap, tiendasSnap] = await Promise.all([
+    getDocs(collection(db, "pedidos")),
+    getDocs(collection(db, "tiendas"))
+  ]);
 
-// Cargar tiendas en el <select>
+  // Mapa de tiendaID → nombre
+  const mapaTiendas = {};
+  tiendasSnap.forEach(d => mapaTiendas[d.id] = d.data().nombre);
+
+  //Primer paso: construimos
+  // -setSabores: para todas las claves saborNombre
+  // -matriz[tiendaNombre][saborNombre] = suma cantidades
+  const setSabores = new Set();
+  const matriz = {};
+  pedidosSnap.forEach(d => {
+    const { tiendaId, detalles = [] } = d.data();
+    const tiendaNombre = mapaTiendas[tiendaId] || tiendaId;
+    if (!matriz[tiendaNombre]) matriz[tiendaNombre] = {};
+    detalles.forEach(({ saborNombre = "Desconocido", cantidad = 0 }) => {
+      setSabores.add(saborNombre);
+      matriz[tiendaNombre][saborNombre] = (matriz[tiendaNombre][saborNombre] || 0) + cantidad;
+    });
+  });
+
+  const sabores = Array.from(setSabores).sort();
+  const tiendas = Object.keys(matriz);
+
+  // Colores
+  const colores = generarColores(tiendas.length);
+
+  const datasets = tiendas.map((tienda, i) => ({
+    label: tienda,
+    data: sabores.map(s => matriz[tienda][s] || 0),
+    backgroundColor: colores[i]
+  }));
+
+  // destruimos la anterior si existía
+  if (chartComparativa) chartComparativa.destroy();
+
+  chartComparativa = new Chart(ctxComparativa, {
+    type: "bar",
+    data: { labels: sabores, datasets },
+    options: { 
+      responsive: true,
+      plugins: {
+        legend: { position: "bottom" },
+        title: {
+          display: true,
+          text: "Comparativa de paletas por sabor y tienda"
+        }
+      },
+      scales: {
+        x: { title: { display: true, text: "Sabores" } },
+        y: { title: { display: true, text: "Cantidad" }, beginAtZero: true }
+      }
+    }
+  });  
+}
+
+// Cargar el select de tiendas para borrar
 async function cargarTiendasParaBorrar() {
   const snapshot = await getDocs(collection(db, "tiendas"));
-  snapshot.forEach((docTiendas) => {
-    const option = document.createElement("option");
-    option.value = docTiendas.id;
-    option.textContent = docTiendas.data().nombre;
-    tiendaBorrarSelect.appendChild(option);
+  snapshot.forEach(docTienda => {
+    const opt = document.createElement("option");
+    opt.value = docTienda.id;
+    opt.textContent = docTienda.data().nombre;
+    tiendaBorrarSelect.appendChild(opt);
   });
 }
 
-// Borrar pedidos de la tienda seleccionada
+// Mostrar cuántos pedidos tiene la tienda seleccionada
+tiendaBorrarSelect.addEventListener("change", async () => {
+  const tiendaId = tiendaBorrarSelect.value;
+  if (!tiendaId) {
+    infoPedidosTienda.textContent = "";
+    return;
+  }
+  const snapshot = await getDocs(collection(db, "pedidos"));
+  const count = snapshot.docs.filter(doc => doc.data().tiendaId === tiendaId).length;
+  infoPedidosTienda.textContent = count
+    ? `Esta tienda tiene ${count} paletas pedidas.`
+    : "Esta tienda no tiene pedidos registrados.";
+});
+
+// Borrar todos los pedidos de la tienda seleccionada
 btnBorrarPedidosTienda.addEventListener("click", async () => {
   const tiendaId = tiendaBorrarSelect.value;
-  if (!tiendaId) return alert("Selecciona una tienda");
+  if (!tiendaId) return alert("Selecciona una tienda.");
 
-  const confirmar = confirm(
-    `¿Estás seguro de que quieres borrar todos los pedidos de la tienda ${tiendaId}?`
-  );
-  if (!confirmar) return;
+  if (!confirm("¿Seguro que quieres borrar todos los pedidos de esta tienda?")) return;
 
-  const snapshot = await getDocs(collection(db, "pedidos"));
-  const eliminaciones = [];
+  const pedidosSnap = await getDocs(collection(db, "pedidos"));
+  const borrados = pedidosSnap.docs
+    .filter(doc => doc.data().tiendaId === tiendaId)
+    .map(docPedido => deleteDoc(doc(db, "pedidos", docPedido.id)));
 
-  snapshot.forEach((pedido) => {
-    if (pedido.data().tiendaId === tiendaId) {
-      eliminaciones.push(deleteDoc(doc(db, "pedidos", pedido.id)));
-    }
-  });
+  await Promise.all(borrados);
+  alert("Pedidos eliminados correctamente.");
 
-  await Promise.all(eliminaciones);
-  alert("Pedidos eliminados correctamente");
-
-  infoPedidosTienda.textContent = "";
+  // Refrescar select y estadística
   tiendaBorrarSelect.selectedIndex = 0;
-
-  await cargarEstadisticas();
-
+  infoPedidosTienda.textContent = "";
+  cargarEstadisticas();
 });
 
-tiendaBorrarSelect.addEventListener("change", async () => {
-    const tiendaId = tiendaBorrarSelect.value;
-    if (!tiendaId) {
-        infoPedidosTienda.textContent = "";
-        return;
-    }
-
-    const snapshot = await getDocs(collection(db, "pedidos"));
-    let contador = 0;
-
-    snapshot.forEach((pedido) => {
-        if (pedido.data().tiendaId === tiendaId) {
-            contador++;
-        }
-    });
-
-    if (contador === 0) {
-        infoPedidosTienda.textContent = "Esta tienda no tiene pedidos registrados";
-    } else {
-        infoPedidosTienda.textContent = `Esta tienda tiene ${contador} pedido(s).`;
-    }
-});
-
-cargarTiendasParaBorrar();
-cargarEstadisticas();
+// Inicialización
+await Promise.all([
+  cargarTiendasParaBorrar(),
+  cargarEstadisticas()
+]);
