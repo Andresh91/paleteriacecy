@@ -6,6 +6,7 @@
     <title>Administrador - Estadísticas de Pedidos</title>
     <link rel="stylesheet" href="styles.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script type="module" src="admin.js" defer></script>
   </head>
   <body>
@@ -29,8 +30,8 @@
     </div>
 
     <!-- Contenedor gráfica de comparativa sabores x tiendas -->
-    <div id="contenedorGraficaComparativa" style="display: none; margin-top: 20px;">
-      <canvas id="graficaComparativa" width="700" height="300"></canvas>
+    <div id="contenedorGraficaComparativa" style="display: none">
+      <canvas id="graficaComparativa"></canvas>
     </div>
 
     <div style="text-align: center; margin-bottom: 20px">
