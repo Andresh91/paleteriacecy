@@ -146,6 +146,7 @@ async function graficaComparativaSabores() {
     data: { labels: sabores, datasets },
     options: { 
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { position: "bottom" },
         title: {
