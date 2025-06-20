@@ -10,6 +10,8 @@ const btnBorrarPedidosTienda = document.getElementById("btnBorrarPedidosTienda")
 // Contexto del canvas
 const ctxTiendas = document.getElementById("graficaTiendas").getContext("2d");
 
+Chart.register(ChartDataLabels);
+
 // Variable para la gráfica
 let chartTiendas;
 
@@ -48,6 +50,7 @@ async function cargarEstadisticas() {
   const data = Object.values(conteoTiendas);
 
   if (chartTiendas) chartTiendas.destroy();
+
   chartTiendas = new Chart(ctxTiendas, {
     type: "bar",
     data: {
@@ -58,7 +61,19 @@ async function cargarEstadisticas() {
         backgroundColor: "#8B4513"
       }]
     },
-    options: { responsive: true }
+    options: { 
+      responsive: true,
+      plugins: {
+        datalabels: {
+          anchor: "end",
+          align: "end",
+          color: '#000',
+          font: { weight: 'bold', size: 12 },
+          formatter: (value) => value
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
   });
 }
 
