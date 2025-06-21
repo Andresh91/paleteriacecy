@@ -26,22 +26,20 @@
     <!-- Sección de estadísticas -->
     <h2>Estadísticas</h2>
 
-    <div style="text-align: center; margin-bottom: 20px">
-      <button id="btnGraficaTiendas">Pedidos por Tienda</button>
+    <div style="text-align: center; margin-bottom: 20px">      
       <button id="btnGraficaComparativa">Comparativa Sabores x Tiendas</button>
     </div>
 
-    <!-- Contenedor gráfica de pedidos por tienda -->
-    <div id="contenedorGraficaTiendas" style="display: block">
-      <canvas id="graficaTiendas"></canvas>
-    </div>
-
+    <section>
     <!-- Contenedor gráfica de comparativa sabores x tiendas -->
     <div id="contenedorGraficaComparativa" style="display: none">
-      <h5 id="totalPaletas" style="text-align: center; margin: 10px 0; font-size: 18px; color: #666;"></h5>
+      <h5 id="totalPaletas" style="color: #666; font-weight: bold;"></h5>
+      <div id="listaTiendasTotales" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;"></div>
       <canvas id="graficaComparativa"></canvas>
     </div>
+    </section>
 
+    <section>
     <div style="text-align: center; margin-bottom: 20px">
       <label for="tiendaBorrar">Selecciona una tienda para borrar:</label>
       <select id="tiendaBorrar">
@@ -53,23 +51,25 @@
         <option value="">-- Selecciona un pedido --</option>
       </select>
 
-
       <p id="infoPedidosTienda" style="margin-top: 10px; font-weight: bold"></p>
       <button id="btnBorrarPedidosTienda" style="background-color: crimson; color: white">
         Borrar pedidos de tienda
       </button>
     </div>
+    </section>
 
+    <section>
     <div id="formAgregarTienda">
-          <h3>Agregar nueva tienda</h3>
-          <input type="text" id="nombreTiendaInput" placeholder="Nombre de la tienda">
-          <input type="password" id="contrasenaTiendaInput" placeholder="Contraseña de la tienda">
-          <button id="btnAgregarTienda">Agregar Tienda</button>
-          <h3>Borrar tienda</h3>
-          <select id="tiendaEliminarSelect">
-            <option value="">-- Selecciona una tienda --</option>
-          </select>
-          <button id="btnEliminarTienda">Eliminar tienda</button>
-      </div>
+      <h3>Agregar nueva tienda</h3>
+        <input type="text" id="nombreTiendaInput" placeholder="Nombre de la tienda">
+        <input type="password" id="contrasenaTiendaInput" placeholder="Contraseña de la tienda">
+        <button id="btnAgregarTienda">Agregar Tienda</button>
+      <h3>Borrar tienda</h3>
+      <select id="tiendaEliminarSelect">
+        <option value="">-- Selecciona una tienda --</option>
+      </select>
+      <button id="btnEliminarTienda">Eliminar tienda</button>
+    </div>
+    </section>
   </body>
 </html>
