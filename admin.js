@@ -63,8 +63,8 @@ async function cargarEstadisticas() {
       responsive: true,
       plugins: {
         datalabels: {
-          anchor: "end",
-          align: "end",
+          anchor: "center",
+          align: "center",
           color: '#000',
           font: { weight: 'bold', size: 12 },
           formatter: (value) => value
@@ -114,9 +114,11 @@ async function graficaComparativaSabores() {
   // -matriz[tiendaNombre][saborNombre] = suma cantidades
   const setSabores = new Set();
   const matriz = {};
+
   pedidosSnap.forEach(d => {
     const { tiendaId, detalles = [] } = d.data();
     const tiendaNombre = mapaTiendas[tiendaId] || tiendaId;
+
     if (!matriz[tiendaNombre]) matriz[tiendaNombre] = {};
     detalles.forEach(({ saborNombre = "Desconocido", cantidad = 0 }) => {
       setSabores.add(saborNombre);
@@ -136,28 +138,50 @@ async function graficaComparativaSabores() {
     backgroundColor: colores[i]
   }));
 
-  // destruimos la anterior si existía
+  // Destruimos la anterior si existía
   if (chartComparativa) chartComparativa.destroy();
 
+  // Calcular total general de paletas
+  let totalPaletas = 0;
+  Object.values(matriz).forEach(sabores => {
+    Object.values(sabores).forEach(cantidad => {
+      totalPaletas += cantidad;
+    });
+  });
+
+  // Mostrar el total en el h5
+  document.getElementById("totalPaletas").textContent = `Total de paletas pedidas: ${totalPaletas}`;
+
   chartComparativa = new Chart(ctxComparativa, {
-    type: "bar",
-    data: { labels: sabores, datasets },
-    options: { 
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: "bottom" },
-        title: {
-          display: true,
-          text: "Comparativa de paletas por sabor y tienda"
-        }
+  type: "bar",
+  data: { labels: sabores, datasets },
+  options: { 
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "bottom" },
+      title: {
+        display: true,
+        text: "Comparativa de paletas por sabor y tienda"
       },
-      scales: {
-        x: { title: { display: true, text: "Sabores" } },
-        y: { title: { display: true, text: "Cantidad" }, beginAtZero: true }
+      datalabels: {
+        anchor: 'center',
+        align: 'center',
+        color: '#000',
+        font: {
+          weight: 'bold',
+          size: 12
+        },
+        formatter: value => value
       }
+    },
+    scales: {
+      x: { title: { display: true, text: "Sabores" } },
+      y: { title: { display: true, text: "Cantidad" }, beginAtZero: true }
     }
-  });  
+  }, // ← ahora sí cierra correctamente el bloque options
+  plugins: [ChartDataLabels]
+});
 }
 
 // Cargar el select de tiendas para borrar
