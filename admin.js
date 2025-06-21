@@ -1,4 +1,4 @@
-import { db, collection, getDocs, deleteDoc, doc, updateDoc, getDoc } from "./firebase.js";
+import { db, collection, getDocs, deleteDoc, auth, doc, updateDoc, getDoc, addDoc } from "./firebase.js";
 
 // Referencias a botones y contenedores
 const btnGraficaTiendas = document.getElementById("btnGraficaTiendas");
@@ -9,8 +9,6 @@ const btnBorrarPedidosTienda = document.getElementById("btnBorrarPedidosTienda")
 
 // Contexto del canvas
 const ctxTiendas = document.getElementById("graficaTiendas").getContext("2d");
-
-Chart.register(ChartDataLabels);
 
 // Variable para la gráfica
 let chartTiendas;
@@ -223,7 +221,81 @@ btnBorrarPedidosTienda.addEventListener("click", async () => {
 });
 
 // Inicialización
-await Promise.all([
-  cargarTiendasParaBorrar(),
-  cargarEstadisticas()
-]);
+document.addEventListener("DOMContentLoaded", async () => {
+  await Promise.all([
+    cargarTiendasParaBorrar(),
+    cargarEstadisticas(),
+    cargarTiendasEliminar()
+  ]);
+});
+
+// Agregar nueva tienda
+const nombreTiendaInput = document.getElementById("nombreTiendaInput");
+const contrasenaTiendaInput = document.getElementById("contrasenaTiendaInput");
+const btnAgregarTienda = document.getElementById("btnAgregarTienda");
+
+btnAgregarTienda.addEventListener("click", async () => {
+  const nombre = nombreTiendaInput.value.trim();
+  const contraseña = contrasenaTiendaInput.value.trim();
+
+  if (!nombre || !contraseña) {
+    return alert("Escribe un nombre para la tienda");
+  }
+
+  try {
+    await addDoc(collection(db, "tiendas"), { nombre, contraseña });
+    alert("Tienda agregada correctamente");
+    nombreTiendaInput.value = "";
+    contrasenaTiendaInput.value = "";
+
+    // Actualizar el select de tiendas para borrar
+    tiendaBorrarSelect.innerHTML = '<option value="">-- Selecciona una tienda --</option>';
+    await cargarTiendasParaBorrar();
+    await cargarEstadisticas();
+  } catch (error) {
+    alert("Error al agregar tienda: " + error.message);
+  }
+});
+
+const tiendaEliminarSelect = document.getElementById("tiendaEliminarSelect");
+const btnEliminarTienda = document.getElementById("btnEliminarTienda");
+
+// Cargar opciones para el select de eliminación
+async function cargarTiendasEliminar() {
+  tiendaEliminarSelect.innerHTML = '<option value="">-- Selecciona una tienda --</option>';
+  const snapshot = await getDocs(collection(db, "tiendas"));
+  snapshot.forEach(docTienda => {
+    const opt = document.createElement("option");
+    opt.value = docTienda.id;
+    opt.textContent = docTienda.data().nombre;
+    tiendaEliminarSelect.appendChild(opt);
+  });
+}
+
+// Eliminar tienda
+btnEliminarTienda.addEventListener("click", async () => {
+  const tiendaId = tiendaEliminarSelect.value;
+  if (!tiendaId) return alert("Selecciona una tienda para eliminar");
+
+  const confirmar = confirm("¿Seguro que quieres eliminar esta tienda?");
+  if (!confirmar) return;
+
+  try {
+    await deleteDoc(doc(db, "tiendas", tiendaId));
+    alert("Tienda eliminada correctamente");
+
+    // Refrescar selects
+    await cargarTiendasEliminar();
+    await cargarTiendasParaBorrar();
+    await cargarEstadisticas();
+  } catch (error) {
+    alert("Error al eliminar tienda: " + error.message);
+  }
+});
+
+const btnMenu = document.getElementById("btnMenu");
+const menuOpciones = document.getElementById("menuOpciones");
+
+btnMenu.addEventListener("click", () => {
+  menuOpciones.classList.toggle("oculto");
+});
