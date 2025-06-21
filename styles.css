@@ -281,8 +281,11 @@ canvas {
 }
 
 #contenedorGraficaComparativa{
+    min-height: 400px;
     height: 400px;
     position: relative;
+    overflow-y: auto;
+    margin-bottom: 30px;
 }
 
 .sabor-item {
@@ -438,4 +441,11 @@ button#btnActualizarEstadisticas:hover {
 
 .btn-eliminar-sabor:hover{
     background-color: #c0392b;
+}
+
+.lista-tiendas{
+    margin-top: 10px;
+    text-align: center;
+    color: #666;
+    font-weight: bold;
 }
