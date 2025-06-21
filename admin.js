@@ -83,6 +83,9 @@ async function graficaComparativaSabores() {
   const sabores = Array.from(setSabores).sort();
   const tiendas = Object.keys(matriz);
 
+  const canvas = document.getElementById("graficaComparativa");
+  canvas.style.minWidth = `${sabores.length * 80}px`;
+
   // Colores
   const colores = generarColores(tiendas.length);
 
