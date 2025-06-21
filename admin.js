@@ -1,23 +1,9 @@
 import { db, collection, getDocs, deleteDoc, auth, doc, updateDoc, getDoc, addDoc } from "./firebase.js";
 
 // Referencias a botones y contenedores
-const btnGraficaTiendas = document.getElementById("btnGraficaTiendas");
-const contenedorGraficaTiendas = document.getElementById("contenedorGraficaTiendas");
 const tiendaBorrarSelect = document.getElementById("tiendaBorrar");
 const infoPedidosTienda = document.getElementById("infoPedidosTienda");
 const btnBorrarPedidosTienda = document.getElementById("btnBorrarPedidosTienda");
-
-// Contexto del canvas
-const ctxTiendas = document.getElementById("graficaTiendas").getContext("2d");
-
-// Variable para la gráfica
-let chartTiendas;
-
-// Al hacer clic: mostrar solo la gráfica de tiendas
-btnGraficaTiendas.addEventListener("click", () => {
-  contenedorGraficaTiendas.style.display = "block";
-  contenedorComparativa.style.display = "none";
-});
 
 // Función para cargar y graficar datos
 async function cargarEstadisticas() {
@@ -42,37 +28,6 @@ async function cargarEstadisticas() {
       conteoTiendas[nombre] = (conteoTiendas[nombre] || 0) + cantidad;
     });
   });
-
-  // Graficar
-  const labels = Object.keys(conteoTiendas);
-  const data = Object.values(conteoTiendas);
-
-  if (chartTiendas) chartTiendas.destroy();
-
-  chartTiendas = new Chart(ctxTiendas, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [{
-        label: "Total de paletas",
-        data,
-        backgroundColor: "#8B4513"
-      }]
-    },
-    options: { 
-      responsive: true,
-      plugins: {
-        datalabels: {
-          anchor: "center",
-          align: "center",
-          color: '#000',
-          font: { weight: 'bold', size: 12 },
-          formatter: (value) => value
-        }
-      }
-    },
-    plugins: [ChartDataLabels]
-  });
 }
 
 const btnComparativa = document.getElementById("btnGraficaComparativa");
@@ -82,7 +37,6 @@ let chartComparativa;
 
 // Mostrar/ocultar contenedores
 btnComparativa.addEventListener("click", async () => {
-  contenedorGraficaTiendas.style.display = "none";
   contenedorComparativa.style.display = "block";
   await graficaComparativaSabores();
 });
@@ -135,7 +89,8 @@ async function graficaComparativaSabores() {
   const datasets = tiendas.map((tienda, i) => ({
     label: tienda,
     data: sabores.map(s => matriz[tienda][s] || 0),
-    backgroundColor: colores[i]
+    backgroundColor: colores[i],
+    barThickness: 10
   }));
 
   // Destruimos la anterior si existía
@@ -151,6 +106,27 @@ async function graficaComparativaSabores() {
 
   // Mostrar el total en el h5
   document.getElementById("totalPaletas").textContent = `Total de paletas pedidas: ${totalPaletas}`;
+
+  const contenedorLista = document.getElementById("listaTiendasTotales");
+  contenedorLista.innerHTML = "";
+
+  tiendas.forEach((tienda, index) => {
+    const totalTienda = datasets[index].data.reduce((sum, val) => sum + val, 0);
+
+    const tarjeta = document.createElement("div");
+    tarjeta.style.background = colores[index];
+    tarjeta.style.padding = "3px";
+    tarjeta.style.borderRadius = "8px";
+    tarjeta.style.minWidth = "120px";
+    tarjeta.style.textAlign = "center";
+    tarjeta.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
+    tarjeta.style.color = "#333";
+    tarjeta.style.fontWeight = "bold";
+    tarjeta.style.fontSize = "11px";
+
+    tarjeta.innerHTML = `<div>${tienda}</div><div>${totalTienda} paletas</div>`;
+    contenedorLista.appendChild(tarjeta);
+  });
 
   chartComparativa = new Chart(ctxComparativa, {
   type: "bar",
@@ -168,6 +144,7 @@ async function graficaComparativaSabores() {
         anchor: 'center',
         align: 'center',
         color: '#000',
+        rotation: -90,
         font: {
           weight: 'bold',
           size: 12
