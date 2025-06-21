@@ -12,8 +12,15 @@
   <body>
     <!-- Barra de navegación -->
     <header class="barra-navegacion">
-      <a href="index.html" class="btn-volver">← Volver al inicio</a>
-      <h1>Panel del Administrador</h1>
+      <nav class="barra-opciones">
+        <h1>🍦 Panel del Administrador de CECY 🍦</h1>
+        <div class="menu-contenedor">
+          <button id="btnMenu" class="menu-hamburguesa">☰</button>
+          <div id="menuOpciones" class="menu-opciones oculto">
+            <a href="index.html" class="btn-volver">← Volver al inicio</a>
+          </div>
+        </div>
+      </nav>
     </header>
 
     <!-- Sección de estadísticas -->
@@ -51,5 +58,17 @@
         Borrar pedidos de tienda
       </button>
     </div>
+
+    <div id="formAgregarTienda">
+          <h3>Agregar nueva tienda</h3>
+          <input type="text" id="nombreTiendaInput" placeholder="Nombre de la tienda">
+          <input type="password" id="contrasenaTiendaInput" placeholder="Contraseña de la tienda">
+          <button id="btnAgregarTienda">Agregar Tienda</button>
+          <h3>Borrar tienda</h3>
+          <select id="tiendaEliminarSelect">
+            <option value="">-- Selecciona una tienda --</option>
+          </select>
+          <button id="btnEliminarTienda">Eliminar tienda</button>
+      </div>
   </body>
 </html>
