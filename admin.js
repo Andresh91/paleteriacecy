@@ -149,7 +149,7 @@ async function graficaComparativaSabores() {
           weight: 'bold',
           size: 12
         },
-        formatter: value => value
+        formatter: value => value === 0 ? "" : value
       }
     },
     scales: {
