@@ -153,7 +153,12 @@ async function graficaComparativaSabores() {
       }
     },
     scales: {
-      x: { title: { display: true, text: "Sabores" } },
+      x: { title: { display: true, text: "Sabores" },
+      ticks: { autoSkip: false }, grid: { display: false },
+      stacked: false,
+      categoryPercentage: 1.0,
+      barPercentage: 0.5
+    },
       y: { title: { display: true, text: "Cantidad" }, beginAtZero: true }
     }
   }, // ← ahora sí cierra correctamente el bloque options
