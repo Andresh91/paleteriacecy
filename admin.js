@@ -80,19 +80,32 @@ async function graficaComparativaSabores() {
     });
   });
 
-  const sabores = Array.from(setSabores).sort();
+  const saboresSinTotales = Array.from(setSabores).sort();
   const tiendas = Object.keys(matriz);
 
+  const totalesPorSabor = {};
+  saboresSinTotales.forEach(sabor => totalesPorSabor[sabor] = 0);
+
+  Object.values(matriz).forEach(tiendaData => {
+    saboresSinTotales.forEach(sabor => {
+      totalesPorSabor[sabor] += tiendaData[sabor] || 0;
+    });
+  });
+
+  const saboresEtiquetas = saboresSinTotales.map(sabor => `${sabor}\n(${totalesPorSabor[sabor]})`);
+
   const canvas = document.getElementById("graficaComparativa");
-  canvas.style.minWidth = `${sabores.length * 80}px`;
+  canvas.style.minWidth = `${saboresSinTotales.length * 100}px`;
 
   // Colores
   const colores = generarColores(tiendas.length);
 
   const datasets = tiendas.map((tienda, i) => ({
     label: tienda,
-    data: sabores.map(s => matriz[tienda][s] || 0),
+    data: saboresSinTotales.map(s => matriz[tienda][s] || 0),
     backgroundColor: colores[i],
+    borderColor: 'black',
+    borderWidth: 0.5,
     barThickness: 10
   }));
 
@@ -131,9 +144,33 @@ async function graficaComparativaSabores() {
     contenedorLista.appendChild(tarjeta);
   });
 
+  // Lineas entre sabores
+  const lineasEntreSabores = {
+    id: 'lineasEntreSabores',
+    beforeDraw: (chart) => {
+      const ctx = chart.ctx;
+      const xAxis = chart.scales.x;
+
+      for (let i = 1; i < saboresSinTotales.length; i++) {
+        const espacio = xAxis.getPixelForTick(1) - xAxis.getPixelForTick(0);
+        const x = xAxis.getPixelForTick(i) - espacio / 2;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(x, chart.chartArea.top);
+        ctx.lineTo(x, chart.chartArea.bottom);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#999";
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  };
+
   chartComparativa = new Chart(ctxComparativa, {
   type: "bar",
-  data: { labels: sabores, datasets },
+  data: { labels: saboresEtiquetas, datasets },
   options: { 
     responsive: true,
     maintainAspectRatio: false,
@@ -159,13 +196,13 @@ async function graficaComparativaSabores() {
       x: { title: { display: true, text: "Sabores" },
       ticks: { autoSkip: false }, grid: { display: false },
       stacked: false,
-      categoryPercentage: 1.0,
+      categoryPercentage: 0.8,
       barPercentage: 0.5
     },
       y: { title: { display: true, text: "Cantidad" }, beginAtZero: true }
     }
   }, // ← ahora sí cierra correctamente el bloque options
-  plugins: [ChartDataLabels]
+  plugins: [ChartDataLabels, lineasEntreSabores]
 });
 }
 
